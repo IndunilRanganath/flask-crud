@@ -1,5 +1,7 @@
 # from crypt import methods
 # from urllib import request
+# from crypt import methods
+from os import abort
 from flask import Flask,render_template,request,redirect
 from models import db,StudentModel
 
@@ -54,4 +56,18 @@ def create():
 def RetrieveList():
     students = StudentModel.query.all()
     return render_template('index.html', students = students)
+
+
+@app.route('/<int:id>/delete', methods=['GET','POST'])
+def delete(id):
+    students =  StudentModel.query.filter_by(id=id).first() 
+    if request.method == 'POST':
+        if students:
+            db.session.delete(students)
+            db.session.commit()
+            return redirect('/')
+        abort(404)
+    return render_template('delete.html')
+
+
 app.run(host='localhost',  port=5000)
